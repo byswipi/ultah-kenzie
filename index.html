@@ -78,12 +78,13 @@ p{font-size:18px;line-height:1.4;margin:8px 0}
 .sh{animation:no .4s}
 .big2{font-size:56px;font-weight:700;margin:10px 0;line-height:1.2}
 .dot{display:block;width:56px;height:56px;border-radius:50%}
+#hud #skip{width:auto;height:auto;border-radius:999px;padding:8px 14px;font:600 15px Fredoka,system-ui,sans-serif;color:var(--ink)}
 </style>
 </head>
 <body>
 <div id="app">
  <div class="fl"><span style="left:6%;top:18%">🎈</span><span style="right:8%;top:30%;animation-delay:-2s">🎁</span><span style="left:12%;bottom:12%;animation-delay:-1s">⭐</span><span style="right:10%;bottom:16%;animation-delay:-3s">🎉</span></div>
- <div id="hud"><div id="stars">⭐ <b id="sc">0</b> / 15</div><button id="mute" aria-label="Suara">🔊</button></div>
+ <div id="hud"><div id="stars">⭐ <b id="sc">0</b> / 15</div><button id="skip" style="display:none">Lompat ke lilin ⏭️</button><button id="mute" aria-label="Suara">🔊</button></div>
 
  <section id="s0" class="scene on"><div class="card">
   <div class="big">6</div>
@@ -131,7 +132,7 @@ p{font-size:18px;line-height:1.4;margin:8px 0}
   <h1>Selamat Ulang Tahun!</h1>
   <h2>Kenzie Rafasya Alvarendra</h2>
   <p>Semoga Kenzie selalu sehat, ceria, pintar, dan jadi anak yang baik hati. Kamu bintang kecil yang bikin keluarga bahagia!</p>
-  <div class="cert">🏅 Sertifikat Jagoan Umur 6 Tahun<br>⭐ 15 misi selesai<br>20 Oktober 2026</div>
+  <div class="cert">🏅 Sertifikat Jagoan Umur 6 Tahun<br>⭐ <span id="cs2">15</span> misi selesai<br>20 Oktober 2026</div>
   <button class="btn" id="say">Ucapkan! 🗣️</button>
   
   <button class="btn alt" id="again">Main lagi 🔁</button>
@@ -176,7 +177,7 @@ function loop(){
 }
 function rain(n=6){for(let i=0;i<n;i++)setTimeout(()=>burst(Math.random()*innerWidth,innerHeight*.3,30),i*350)}
 
-function go(id){document.querySelectorAll(".scene").forEach(s=>s.classList.toggle("on",s.id===id));$("#hud").style.display=id==="s4"?"none":"flex"}
+function go(id){document.querySelectorAll(".scene").forEach(s=>s.classList.toggle("on",s.id===id));if(SK&&!["s3","s4","s0"].includes(id))return;$("#skip").style.display=["s1","s2","s5","s6","s7"].includes(id)?"":"none";$("#hud").style.display=id==="s4"?"none":"flex"}
 function addStar(){$("#sc").textContent=++stars;snd(880,.3,"triangle",.2);snd(1175,.4,"triangle",.2,.12)}
 
 function g1(){
@@ -251,12 +252,12 @@ function g6(){
  },650);
 }
 
-let IDX=-1;
+let IDX=-1,SK=0;
 const rnd=a=>a[Math.random()*a.length|0],shuf=a=>[...a].sort(()=>Math.random()-.5);
 const yes=(e,k)=>{snd(500+k*80,.2,"triangle",.2);burst(e.clientX,e.clientY,22)};
 const no=b=>{b.classList.add("sh");snd(200,.2,"square",.08);setTimeout(()=>b.classList.remove("sh"),400)};
 const W=()=>{rain(3);addStar();setTimeout(next,1500)};
-function next(){IDX++;if(IDX>=G.length){go("s3");g3();return}
+function next(){if(SK)return;IDX++;if(IDX>=G.length){go("s3");g3();return}
  const g=G[IDX],ar=$("#ga");ar.innerHTML="";$("#gt").textContent="Misi "+(IDX+5)+": "+g[0];$("#gi").textContent=g[1];go("s7");g[2](ar,W)}
 function opts(ar,items,cb){const d=document.createElement("div");d.className="row";items.forEach(x=>{const b=document.createElement("button");b.className="ch";b.innerHTML=x[0];b.onclick=e=>cb(x[1],b,e);d.appendChild(b)});ar.appendChild(d);return d}
 function quiz(ar,win,N,make){let k=0,done=0,row;const q=document.createElement("div");q.className="big2";ar.appendChild(q);
@@ -320,9 +321,10 @@ $("#blow").onclick=()=>{
  document.querySelectorAll(".cd").forEach(c=>c.classList.remove("on"));
  $("#blow").style.display="none";snd(150,.5,"sawtooth",.08);
  burst(innerWidth/2,innerHeight/2,80);addStar();
- setTimeout(()=>{go("s4");melody();rain(8)},1400);
+ setTimeout(()=>{$("#cs2").textContent=stars;go("s4");melody();rain(8)},1400);
 };
 
+$("#skip").onclick=()=>{SK=1;clearInterval(T2);clearInterval(T6);go("s3");g3()};
 $("#go").onclick=()=>{snd(660,.15,"triangle",.2);go("s1");g1()};
 $("#mute").onclick=()=>{muted=!muted;$("#mute").textContent=muted?"🔇":"🔊";if(muted)try{speechSynthesis.cancel()}catch(e){}};
 $("#say").onclick=()=>{
@@ -336,7 +338,7 @@ $("#say").onclick=()=>{
 };
 
 
-$("#again").onclick=()=>{clearInterval(T2);clearInterval(T6);stars=0;$("#sc").textContent=0;IDX=-1;go("s0")};
+$("#again").onclick=()=>{clearInterval(T2);clearInterval(T6);stars=0;$("#sc").textContent=0;IDX=-1;SK=0;go("s0")};
 </script>
 </body>
 </html>
