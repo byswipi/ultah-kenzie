@@ -71,17 +71,24 @@ p{font-size:18px;line-height:1.4;margin:8px 0}
 .ho{position:relative;aspect-ratio:1;border-radius:50%;background:radial-gradient(#6b4423,#2e1c0d);overflow:hidden;cursor:pointer}
 .ho span{position:absolute;left:0;right:0;bottom:-100%;font-size:54px;text-align:center;transition:bottom .2s}
 .ho.up span{bottom:12%}
+#ga{display:flex;flex-direction:column;align-items:center;overflow:visible}
+.row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:340px;margin-top:14px}
+.ch{font:700 34px Fredoka,sans-serif;min-width:80px;min-height:80px;border:0;border-radius:22px;background:var(--card);color:var(--ink);box-shadow:0 5px 0 rgba(124,92,255,.35);cursor:pointer;padding:8px 14px}
+.ch:active{transform:translateY(4px)}
+.sh{animation:no .4s}
+.big2{font-size:56px;font-weight:700;margin:10px 0;line-height:1.2}
+.dot{display:block;width:56px;height:56px;border-radius:50%}
 </style>
 </head>
 <body>
 <div id="app">
  <div class="fl"><span style="left:6%;top:18%">🎈</span><span style="right:8%;top:30%;animation-delay:-2s">🎁</span><span style="left:12%;bottom:12%;animation-delay:-1s">⭐</span><span style="right:10%;bottom:16%;animation-delay:-3s">🎉</span></div>
- <div id="hud"><div id="stars"><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span></div><button id="mute" aria-label="Suara">🔊</button></div>
+ <div id="hud"><div id="stars">⭐ <b id="sc">0</b> / 15</div><button id="mute" aria-label="Suara">🔊</button></div>
 
  <section id="s0" class="scene on"><div class="card">
   <div class="big">6</div>
   <h1>Hai Kenzie!</h1>
-  <p>Tanggal 20 Oktober ini hari spesial kamu. Ada 5 misi seru yang harus kamu selesaikan. Siap jadi jagoan?</p>
+  <p>Tanggal 20 Oktober ini hari spesial kamu. Ada 15 misi seru yang harus kamu selesaikan. Siap jadi jagoan?</p>
   <button class="btn" id="go">Mulai Petualangan 🚀</button>
  </div></section>
 
@@ -110,8 +117,10 @@ p{font-size:18px;line-height:1.4;margin:8px 0}
   <div class="holes" id="holes"></div>
  </section>
 
+ <section id="s7" class="scene"><h2 id="gt"></h2><p id="gi"></p><div class="arena" id="ga"></div></section>
+
  <section id="s3" class="scene">
-  <h2>Misi 5: Nyalakan lilinnya!</h2>
+  <h2>Misi 15: Nyalakan lilinnya!</h2>
   <p id="hint3"></p>
   <div class="cake"><div class="cs" id="cs"></div><div class="t"></div><div class="b"></div><div class="p"></div></div>
   <button class="btn" id="blow" style="display:none">Tiup lilin! 💨</button>
@@ -122,7 +131,7 @@ p{font-size:18px;line-height:1.4;margin:8px 0}
   <h1>Selamat Ulang Tahun!</h1>
   <h2>Kenzie Rafasya Alvarendra</h2>
   <p>Semoga Kenzie selalu sehat, ceria, pintar, dan jadi anak yang baik hati. Kamu bintang kecil yang bikin keluarga bahagia!</p>
-  <div class="cert">🏅 Sertifikat Jagoan Umur 6 Tahun<br>⭐⭐⭐⭐⭐<br>20 Oktober 2026</div>
+  <div class="cert">🏅 Sertifikat Jagoan Umur 6 Tahun<br>⭐ 15 misi selesai<br>20 Oktober 2026</div>
   <button class="btn" id="say">Ucapkan! 🗣️</button>
   
   <button class="btn alt" id="again">Main lagi 🔁</button>
@@ -168,7 +177,7 @@ function loop(){
 function rain(n=6){for(let i=0;i<n;i++)setTimeout(()=>burst(Math.random()*innerWidth,innerHeight*.3,30),i*350)}
 
 function go(id){document.querySelectorAll(".scene").forEach(s=>s.classList.toggle("on",s.id===id));$("#hud").style.display=id==="s4"?"none":"flex"}
-function addStar(){document.querySelectorAll("#stars span")[stars++]?.classList.add("on");snd(880,.3,"triangle",.2);snd(1175,.4,"triangle",.2,.12)}
+function addStar(){$("#sc").textContent=++stars;snd(880,.3,"triangle",.2);snd(1175,.4,"triangle",.2,.12)}
 
 function g1(){
  const ar=$("#a1"),sl=$("#slots");ar.innerHTML="";let n=0;
@@ -234,13 +243,68 @@ function g6(){
   if(!h.classList.contains("up")||n>=8)return;
   h.classList.remove("up");n++;$("#cnt6").textContent=n+" / 8";
   snd(500+n*70,.15,"square",.1);burst(e.clientX,e.clientY,16);
-  if(n===8){clearInterval(T6);rain(3);addStar();setTimeout(()=>{go("s3");g3()},1400)}
+  if(n===8){clearInterval(T6);rain(3);addStar();setTimeout(next,1400)}
  });
  T6=setInterval(()=>{
   const h=hs[Math.random()*6|0];if(h.classList.contains("up"))return;
   h.classList.add("up");setTimeout(()=>h.classList.remove("up"),1300);
  },650);
 }
+
+let IDX=-1;
+const rnd=a=>a[Math.random()*a.length|0],shuf=a=>[...a].sort(()=>Math.random()-.5);
+const yes=(e,k)=>{snd(500+k*80,.2,"triangle",.2);burst(e.clientX,e.clientY,22)};
+const no=b=>{b.classList.add("sh");snd(200,.2,"square",.08);setTimeout(()=>b.classList.remove("sh"),400)};
+const W=()=>{rain(3);addStar();setTimeout(next,1500)};
+function next(){IDX++;if(IDX>=G.length){go("s3");g3();return}
+ const g=G[IDX],ar=$("#ga");ar.innerHTML="";$("#gt").textContent="Misi "+(IDX+5)+": "+g[0];$("#gi").textContent=g[1];go("s7");g[2](ar,W)}
+function opts(ar,items,cb){const d=document.createElement("div");d.className="row";items.forEach(x=>{const b=document.createElement("button");b.className="ch";b.innerHTML=x[0];b.onclick=e=>cb(x[1],b,e);d.appendChild(b)});ar.appendChild(d);return d}
+function quiz(ar,win,N,make){let k=0,done=0,row;const q=document.createElement("div");q.className="big2";ar.appendChild(q);
+ const rd=()=>{if(row)row.remove();const m=make();q.innerHTML=m.q;row=opts(ar,m.c,(v,b,e)=>{if(done)return;if(v===m.a){yes(e,k);if(++k===N){done=1;win()}else rd()}else no(b)});if(m.w)row.style.maxWidth=m.w};rd()}
+function simon(ar,win){const col=["#ff3b3b","#2d7bff","#ffc400","#22b45a"];let seq=[Math.random()*4|0,Math.random()*4|0],pos=0,lock=true;
+ const row=document.createElement("div");row.className="row";row.style.maxWidth="230px";ar.appendChild(row);
+ const flash=i=>{pads[i].style.opacity=1;snd(300+i*120,.25,"triangle",.2);setTimeout(()=>pads[i].style.opacity=.55,300)};
+ const play=()=>{lock=true;pos=0;seq.forEach((s,k)=>setTimeout(()=>flash(s),500+k*650));setTimeout(()=>lock=false,500+seq.length*650)};
+ const pads=col.map((c,i)=>{const b=document.createElement("button");b.className="ch";b.style.cssText=`background:${c};width:100px;height:100px;opacity:.55`;
+  b.onclick=()=>{if(lock)return;flash(i);if(i!==seq[pos]){no(b);setTimeout(play,900);return}
+   if(++pos===seq.length){if(seq.length===4){lock=true;return win()}pos=0;lock=true;setTimeout(()=>{seq.push(Math.random()*4|0);play()},700)}};
+  row.appendChild(b);return b});
+ play()}
+function flower(ar,win){let n=0;const f=document.createElement("div");f.style.cssText="font-size:90px;transition:transform .3s;margin:60px 0 70px";f.textContent="🌱";
+ const b=document.createElement("button");b.className="btn";b.textContent="Siram 💧";
+ b.onclick=e=>{n++;snd(400+n*30,.12,"triangle",.15);burst(e.clientX,e.clientY,8);f.style.transform=`scale(${1+n*.1})`;if(n===5)f.textContent="🌷";if(n===10){f.textContent="🌻";b.remove();win()}};ar.append(f,b)}
+function fly(ar,win){let n=0;const e=document.createElement("div");e.textContent="🦋";e.style.cssText="position:absolute;font-size:56px;padding:14px;transition:left .6s,top .6s;cursor:pointer";
+ const mv=()=>{e.style.left=Math.random()*(ar.clientWidth-90)+"px";e.style.top=Math.random()*(ar.clientHeight-90)+"px"};
+ e.onpointerdown=ev=>{n++;yes(ev,n);if(n===6){clearInterval(t);e.remove();win()}else mv()};
+ ar.appendChild(e);mv();const t=setInterval(mv,1100)}
+function nums(ar,win){let n=1;const row=document.createElement("div");row.className="row";row.style.maxWidth="300px";
+ shuf([1,2,3,4,5,6]).forEach(x=>{const b=document.createElement("button");b.className="ch";b.textContent=x;b.onclick=e=>{if(x!==n)return no(b);yes(e,n);b.style.visibility="hidden";if(++n===7)win()};row.appendChild(b)});ar.appendChild(row)}
+function rocket(ar,win){let p=0;const w=document.createElement("div");w.style.cssText="position:relative;width:100%;height:260px";
+ w.innerHTML='<div style="position:absolute;top:0;left:50%;margin-left:-32px;font-size:60px">🌙</div>';
+ const r=document.createElement("div");r.textContent="🚀";r.style.cssText="position:absolute;bottom:0;left:50%;margin-left:-35px;font-size:70px;transition:bottom .2s";w.appendChild(r);
+ const b=document.createElement("button");b.className="btn";b.textContent="Tap tap tap! ⚡";
+ b.onclick=()=>{if(p>=15)return;p++;r.style.bottom=p*12+"px";snd(300+p*40,.1,"square",.08);if(p===15)win()};ar.append(w,b)}
+function draw(ar,win){const c=document.createElement("canvas");c.width=320;c.height=300;c.style.cssText="background:var(--card);border-radius:22px;touch-action:none;max-width:100%";
+ const g=c.getContext("2d");let d=0,l=null,h=0;
+ const pt=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]};
+ c.onpointerdown=e=>{l=pt(e)};
+ c.onpointermove=e=>{if(!l)return;const p=pt(e);g.strokeStyle=`hsl(${h=(h+4)%360},90%,55%)`;g.lineWidth=10;g.lineCap="round";g.beginPath();g.moveTo(...l);g.lineTo(...p);g.stroke();d+=Math.hypot(p[0]-l[0],p[1]-l[1]);l=p;if(d>1500){d=-1e9;l=null;win()}};
+ c.onpointerup=c.onpointerleave=()=>l=null;ar.appendChild(c)}
+const STAR='<svg viewBox="0 0 24 24" width="52" height="52"><path fill="#ffc400" stroke="#e09b00" stroke-width="1.2" stroke-linejoin="round" d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.4l-5.9 3.2 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>';
+const COL=[["Merah","#ff3b3b"],["Biru","#2d7bff"],["Kuning","#ffc400"],["Hijau","#22b45a"],["Ungu","#8a4dff"],["Oranye","#ff8a1f"]];
+const ANI=[["🐘","Gajah"],["🦒","Jerapah"],["🐯","Harimau"],["🐧","Pinguin"],["🐢","Kura-kura"],["🦁","Singa"],["🐒","Monyet"],["🐼","Panda"]];
+const G=[
+ ["Tebak warna","Ketuk warna yang disebut.",(a,w)=>quiz(a,w,5,()=>{const x=rnd(COL),c=shuf([x,...shuf(COL.filter(y=>y!==x)).slice(0,2)]);return{q:x[0]+"!",c:c.map(y=>[`<span class="dot" style="background:${y[1]}"></span>`,y[0]]),a:x[0]}})],
+ ["Hitung bintang","Ada berapa bintang?",(a,w)=>quiz(a,w,4,()=>{const n=3+Math.random()*5|0;return{q:`<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:320px">${STAR.repeat(n)}</div>`,c:shuf([n,n+1,n-1]).map(x=>[x,x]),a:n}})],
+ ["Ikuti urutan","Lihat lampu yang menyala, lalu ketuk dengan urutan yang sama.",simon],
+ ["Cari yang beda","Ketuk gambar yang berbeda sendiri.",(a,w)=>quiz(a,w,5,()=>{const p=rnd([["🐱","🐶"],["🍎","🍅"],["🚗","🚌"],["🌞","🌙"]]),o=Math.random()*9|0;return{q:"Mana yang beda?",w:"270px",c:Array.from({length:9},(_,i)=>[i===o?p[1]:p[0],i===o]),a:true}})],
+ ["Siram bunga","Ketuk tombol siram sampai bunganya mekar.",flower],
+ ["Kejar kupu-kupu","Ketuk kupu-kupu 6 kali.",fly],
+ ["Urutkan angka","Ketuk angka dari 1 sampai 6 secara berurutan.",nums],
+ ["Hewan apa ini?","Pilih nama hewan yang benar.",(a,w)=>quiz(a,w,5,()=>{const x=rnd(ANI),c=shuf([x,...shuf(ANI.filter(y=>y!==x)).slice(0,2)]);return{q:`<span style="font-size:84px">${x[0]}</span>`,c:c.map(y=>[`<span style="font-size:24px">${y[1]}</span>`,y[1]]),a:x[1]}})],
+ ["Balapan roket","Ketuk tombol cepat-cepat sampai roket tiba di bulan!",rocket],
+ ["Menggambar bebas","Gambar apa saja dengan jarimu.",draw]
+];
 
 function g3(){
  let lit=0;const cs=$("#cs");
@@ -272,7 +336,7 @@ $("#say").onclick=()=>{
 };
 
 
-$("#again").onclick=()=>{clearInterval(T2);clearInterval(T6);stars=0;document.querySelectorAll("#stars span").forEach(s=>s.classList.remove("on"));go("s0")};
+$("#again").onclick=()=>{clearInterval(T2);clearInterval(T6);stars=0;$("#sc").textContent=0;IDX=-1;go("s0")};
 </script>
 </body>
 </html>
